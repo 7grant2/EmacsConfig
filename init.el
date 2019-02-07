@@ -27,12 +27,15 @@
       (desktop-save desktop-dirname)))
 (add-hook 'auto-save-hook 'my-desktop-save)
 
+;;(setq flycheck-check-syntax-automatically '(save new-line))
+;;(flycheck-add-next-checker 'intero '(warning . haskell-hlint))
 
 ;;***********************************
 ;;KEYBINDINGS
 ;;***********************************
 (global-set-key [f5] 'httpd-start)
 (global-set-key [f6] 'impatient-mode)
+(global-set-key (kbd "M-s-^") 'flyspell-auto-correct-word)
 ;;(global-set-key [f7] (lambda () (interactive) (browse-url "http://localhost:8080/imp/")))
 ;;(global-set-key [f8] (lambda () (interactive) (browse-url "http://localhost:8888/")))
 ;;(global-set-key [f9] (lambda () (interactive) (shell-command "open -a MAMP")))
@@ -45,11 +48,9 @@
 (setq highlight-indent-guides-character ?\|)
 (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
 
-
 ;; Allow paste in terminal
 (eval-after-load "term"
   '(define-key term-raw-map (kbd "C-c C-y") 'term-paste))
-
 
 ;;***********************************
 ;; AUTO-COMPLETE 
@@ -97,9 +98,6 @@
 (global-set-key (kbd "C-k C-d") 'indent-buffer)
 (global-set-key (kbd "C-k C-c") 'comment-region)
 (global-set-key (kbd "C-k C-u") 'uncomment-region)
-
-
-
 
 ;;***********************************
 ;; C-AC
@@ -157,8 +155,6 @@
 (put 'set-goal-column 'disabled nil)
 
 
-
-
 ;;***********************************
 ;; EVIL MODE 
 ;;***********************************
@@ -173,21 +169,23 @@
 ;;***********************************
 ;; NEOTREE
 ;;***********************************
-;(neotree)
-(neotree-dir "~/Documents/")
+					;(neotree)
+;; (neotree-dir "~/Documents/")
 (global-set-key (kbd "C-=") 'neotree-toggle)
-;(neotree-hidden-file-toggle)
+					;(neotree-hidden-file-toggle)
 
 ;;***********************************
 ;; HASKELL
 ;;***********************************
 (require 'haskell-mode)
-;;(require 'intero)
-;;(add-hook 'haskell-mode-hook 'intero-mode)
+;; IDE environemnt
+;; https://commercialhaskell.github.io/intero/
+;; (require 'intero)
+(add-hook 'haskell-mode-hook 'intero-mode)
+;; Spellcheck
 (require 'flycheck)
 (add-hook 'haskell-mode-hook #'flycheck-haskell-setup)
-;;(setq flycheck-check-syntax-automatically '(save new-line))
-;;(flycheck-add-next-checker 'intero '(warning . haskell-hlint))
+
 
 ;;***********************************
 ;; BACKUP DIRECTORY
@@ -198,7 +196,7 @@
 ;;***********************************
 ;;HTTPD SERVER and Skewer Mode Init
 ;;***********************************
-(require 'simple-httpd)
+;; (require 'simple-httpd)
 (add-hook 'js2-mode-hook 'skewer-mode)
 (add-hook 'css-mode-hook 'skewer-css-mode)
 (add-hook 'html-mode-hook 'skewer-html-mode)
@@ -232,6 +230,12 @@
 (add-hook 'LaTeX-mode-hook
           (LaTexKey))
 
+(add-hook 'latex-mode-hook 'turn-on-auto-fill)
+(add-hook 'latex-mode-hook 'flyspell-mode)
+
+(setq TeX-parse-self t) ; Enable parse on load.
+(setq TeX-auto-save t) ; Enable parse on save.
+
 ;;***********************************
 ;; Scheme Mode
 ;;***********************************
@@ -257,8 +261,8 @@
 ;; SLIME  for SBCL
 ;;***********************************
 					;(add-to-list 'load-path "/the/path/to/slime")
-(require 'slime-autoloads)
-(require 'slime)
+;; (require 'slime-autoloads)
+;; (require 'slime)
 ;;(setq inferior-lisp-program "/opt/sbcl/bin/sbcl")
 
 (add-hook 'lisp-mode-hook 'slime-mode)
@@ -306,13 +310,21 @@
 ;;***********************************
 ;; ORG 
 ;;***********************************
+(setq org-latex-pdf-process
+      '("pdflatex -interaction nonstopmode -output-directory %o %f"
+	"bibtex %b"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"
+	"pdflatex -interaction nonstopmode -output-directory %o %f"))
+
+(require 'org-ref)
 (defun org-hooks ()
   (lambda() 
     ('visual-line-mode 1)
     ('org-indent-mode 1)))
 
-(add-hook 'org-mode 'org-hooks)
-
+(add-hook 'org-mode-hook 'org-indent-mode)
+(add-hook 'org-mode-hook 'flyspell-mode)
+(add-hook 'org-mode-hook 'auto-fill-mode)
 (add-hook 'text-mode-hook 'turn-on-auto-fill)
 
 ;;***********************************
@@ -323,14 +335,16 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default default default italic underline success warning error])
  '(ansi-color-names-vector
    ["#3F3F3F" "#CC9393" "#7F9F7F" "#F0DFAF" "#8CD0D3" "#DC8CC3" "#93E0E3" "#DCDCCC"])
  '(company-quickhelp-color-background "#4F4F4F")
  '(company-quickhelp-color-foreground "#DCDCCC")
- '(custom-enabled-themes (quote (zenburn)))
+ '(custom-enabled-themes (quote (moe-dark)))
  '(custom-safe-themes
    (quote
-    ("cab317d0125d7aab145bc7ee03a1e16804d5abdfa2aa8738198ac30dc5f7b569" "13d20048c12826c7ea636fbe513d6f24c0d43709a761052adbca052708798ce3" "3f44e2d33b9deb2da947523e2169031d3707eec0426e78c7b8a646ef773a2077" "190a9882bef28d7e944aa610aa68fe1ee34ecea6127239178c7ac848754992df" "e11569fd7e31321a33358ee4b232c2d3cf05caccd90f896e1df6cab228191109" default)))
+    ("26d49386a2036df7ccbe802a06a759031e4455f07bda559dcf221f53e8850e69" "39dd7106e6387e0c45dfce8ed44351078f6acd29a345d8b22e7b8e54ac25bac4" "862a0ccc73c12df4df325427f9285fa6a5bbba593a77257f43b01c84269f51b0" "e61752b5a3af12be08e99d076aedadd76052137560b7e684a8be2f8d2958edc3" "e1943fd6568d49ec819ee3711c266a8a120e452ba08569045dd8f50cc5ec5dd3" "ec5f697561eaf87b1d3b087dd28e61a2fc9860e4c862ea8e6b0b77bd4967d0ba" "cab317d0125d7aab145bc7ee03a1e16804d5abdfa2aa8738198ac30dc5f7b569" "13d20048c12826c7ea636fbe513d6f24c0d43709a761052adbca052708798ce3" "3f44e2d33b9deb2da947523e2169031d3707eec0426e78c7b8a646ef773a2077" "190a9882bef28d7e944aa610aa68fe1ee34ecea6127239178c7ac848754992df" "e11569fd7e31321a33358ee4b232c2d3cf05caccd90f896e1df6cab228191109" default)))
  '(fci-rule-color "#383838")
  '(flymake-google-cpplint-command
    "/Library/Frameworks/Python.framework/Versions/3.6/bin/cpplint")
@@ -339,7 +353,7 @@
     ("#CC9393" "#DFAF8F" "#F0DFAF" "#7F9F7F" "#BFEBBF" "#93E0E3" "#94BFF3" "#DC8CC3")))
  '(package-selected-packages
    (quote
-    (flycheck-haskell scion highlight-indent-guides latex-preview-pane evil-mc intero csharp-mode flycheck markdown-mode md-readme ess ess-R-data-view auctex auctex-latexmk google-c-style flymake-google-cpplint iedit zenburn-theme yasnippet-snippets w3m w3 spotify sly-quicklisp slime racket-mode playerctl php-mode nodejs-repl node-resolver neotree multiple-cursors moz monochrome-theme moe-theme melancholy-theme madhat2r-theme impatient-mode haskell-snippets haskell-mode exec-path-from-shell evil-tutor evil-paredit dumb-jump company-irony common-lisp-snippets clojure-snippets auto-complete-c-headers arduino-mode ace-window ac-js2)))
+    (org-ref auto-correct company centered-window ac-cider cider clojure-mode flycheck-clojure flycheck-haskell scion highlight-indent-guides latex-preview-pane intero flycheck markdown-mode md-readme ess ess-R-data-view auctex auctex-latexmk google-c-style flymake-google-cpplint yasnippet-snippets w3 sly-quicklisp slime racket-mode playerctl php-mode node-resolver moz monochrome-theme moe-theme melancholy-theme madhat2r-theme haskell-snippets exec-path-from-shell evil-tutor evil-paredit dumb-jump company-irony common-lisp-snippets clojure-snippets auto-complete-c-headers arduino-mode ace-window ac-js2)))
  '(pdf-view-midnight-colors (quote ("#DCDCCC" . "#383838")))
  '(vc-annotate-background "#2B2B2B")
  '(vc-annotate-color-map
